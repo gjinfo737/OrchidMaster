@@ -2,7 +2,6 @@ package com.orchidmaster.views;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -13,9 +12,11 @@ import javax.swing.JTextPane;
 public class MainWindow extends JFrame {
     private JTextField textFieldUrlEntry;
     private JComboBox<String> comboBoxLinks;
+    private MainPresenter presenter;
+    private JTextPane textPane;
 
-    public MainWindow(MainPresenter presenter) {
-
+    public MainWindow(MainPresenter _presenter) {
+	this.presenter = _presenter;
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setSize(601, 432);
 	getContentPane().setLayout(null);
@@ -27,6 +28,7 @@ public class MainWindow extends JFrame {
 
 	comboBoxLinks = new JComboBox();
 	comboBoxLinks.setBounds(10, 42, 358, 20);
+
 	getContentPane().add(comboBoxLinks);
 
 	JButton btnAdd = new JButton("Add");
@@ -47,7 +49,7 @@ public class MainWindow extends JFrame {
 	});
 	getContentPane().add(btnGet);
 
-	JTextPane textPane = new JTextPane();
+	textPane = new JTextPane();
 	textPane.setBounds(10, 72, 563, 311);
 	getContentPane().add(textPane);
 
@@ -59,11 +61,28 @@ public class MainWindow extends JFrame {
 	    }
 	});
 	getContentPane().add(btnRemove);
+	comboBoxLinks.setModel(this.presenter);
+	comboBoxLinks.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent arg0) {
+		presenter.setSelectedItem(comboBoxLinks.getSelectedItem());
+	    }
+	});
     }
 
-    public void setUrls(List<String> urls) {
-	for (String itemURL : urls) {
-	    comboBoxLinks.addItem(itemURL);
-	}
+    public String getUrlText() {
+	return textFieldUrlEntry.getText().toLowerCase().trim();
     }
+
+    public String getCurrentSelectedUrl() {
+	return (String) comboBoxLinks.getSelectedItem();
+    }
+
+    public void refresh() {
+	update(getGraphics());
+    }
+
+    public void setContent(String content) {
+	textPane.setText(content);
+    }
+
 }

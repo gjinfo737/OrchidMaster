@@ -1,5 +1,5 @@
 package com.orchidmaster.http;
-import java.io.IOException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -7,24 +7,32 @@ public class HtmlParser implements IHttpResponseListener {
 
     public static final String HTTP_COL_SLASHSLASH = "http://";
 
-    public boolean parseSite(String url) {
+    public interface IHtmlParserListener {
+	public void onParsed(String content);
+
+	public void onMalformedURLException(MalformedURLException e);
+
+    }
+
+    private IHtmlParserListener htmlParserListener;
+
+    public void parseSite(String url, IHtmlParserListener htmlParserListener) {
+	this.htmlParserListener = htmlParserListener;
 	final WebRequestCodeSample webRequestCodeSample = new WebRequestCodeSample();
 
 	try {
 	    webRequestCodeSample.getData(new URL(url), this);
 	} catch (MalformedURLException e) {
 	    e.printStackTrace();
-	    return false;
-	} catch (IOException e) {
-	    e.printStackTrace();
-	    return false;
+	    htmlParserListener.onMalformedURLException(e);
 	}
-	return true;
+
     }
 
     @Override
     public void onResponse(String content) {
 	System.out.println(content.length() + " !!!");
+	htmlParserListener.onParsed(content);
     }
 
     @Override
