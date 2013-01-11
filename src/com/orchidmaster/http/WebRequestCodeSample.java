@@ -1,4 +1,5 @@
 package com.orchidmaster.http;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,7 +102,7 @@ public final class WebRequestCodeSample {
 	    String line;
 	    try {
 		while ((line = reader.readLine()) != null) {
-		    System.out.println(line);
+		    // System.out.println(line);
 		    content += line;
 		}
 	    } catch (IOException e) {

@@ -31,7 +31,7 @@ public class HtmlParser implements IHttpResponseListener {
 
     @Override
     public void onResponse(String content) {
-	System.out.println(content.length() + " !!!");
+	// System.out.println(content.length() + " !!!");
 	htmlParserListener.onParsed(content);
     }
 

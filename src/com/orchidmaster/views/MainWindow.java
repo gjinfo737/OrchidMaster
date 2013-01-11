@@ -9,6 +9,11 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
 public class MainWindow extends JFrame {
     private JTextField textFieldUrlEntry;
     private JComboBox<String> comboBoxLinks;
@@ -19,17 +24,28 @@ public class MainWindow extends JFrame {
 	this.presenter = _presenter;
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setSize(601, 432);
-	getContentPane().setLayout(null);
+	getContentPane().setLayout(
+		new FormLayout(new ColumnSpec[] {
+			FormFactory.UNRELATED_GAP_COLSPEC,
+			ColumnSpec.decode("358px"),
+			FormFactory.UNRELATED_GAP_COLSPEC,
+			ColumnSpec.decode("96px"),
+			FormFactory.UNRELATED_GAP_COLSPEC,
+			ColumnSpec.decode("89px"), }, new RowSpec[] {
+			FormFactory.UNRELATED_GAP_ROWSPEC,
+			RowSpec.decode("23px"),
+			FormFactory.RELATED_GAP_ROWSPEC,
+			RowSpec.decode("23px"),
+			FormFactory.RELATED_GAP_ROWSPEC,
+			RowSpec.decode("311px"), }));
 
 	textFieldUrlEntry = new JTextField();
-	textFieldUrlEntry.setBounds(10, 11, 358, 20);
-	getContentPane().add(textFieldUrlEntry);
+	getContentPane().add(textFieldUrlEntry, "2, 2, fill, center");
 	textFieldUrlEntry.setColumns(10);
 
 	comboBoxLinks = new JComboBox();
-	comboBoxLinks.setBounds(10, 42, 358, 20);
 
-	getContentPane().add(comboBoxLinks);
+	getContentPane().add(comboBoxLinks, "2, 4, fill, center");
 
 	JButton btnAdd = new JButton("Add");
 	btnAdd.addActionListener(new ActionListener() {
@@ -37,30 +53,26 @@ public class MainWindow extends JFrame {
 		presenter.onAddUrl();
 	    }
 	});
-	btnAdd.setBounds(378, 10, 96, 23);
-	getContentPane().add(btnAdd);
+	getContentPane().add(btnAdd, "4, 2, fill, top");
 
 	JButton btnGet = new JButton("Get");
-	btnGet.setBounds(484, 11, 89, 53);
 	btnGet.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
 		presenter.onGetSite();
 	    }
 	});
-	getContentPane().add(btnGet);
+	getContentPane().add(btnGet, "6, 2, 1, 3, fill, fill");
 
 	textPane = new JTextPane();
-	textPane.setBounds(10, 72, 563, 311);
-	getContentPane().add(textPane);
+	getContentPane().add(textPane, "2, 6, 5, 1, fill, fill");
 
 	JButton btnRemove = new JButton("Remove");
-	btnRemove.setBounds(378, 41, 96, 23);
 	btnRemove.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
 		presenter.onRemoveUrl();
 	    }
 	});
-	getContentPane().add(btnRemove);
+	getContentPane().add(btnRemove, "4, 4, fill, top");
 	comboBoxLinks.setModel(this.presenter);
 	comboBoxLinks.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
@@ -84,5 +96,4 @@ public class MainWindow extends JFrame {
     public void setContent(String content) {
 	textPane.setText(content);
     }
-
 }

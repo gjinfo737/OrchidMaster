@@ -1,7 +1,11 @@
 package com.orchidmaster.views;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +13,15 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
+import com.google.gson.Gson;
 import com.orchidmaster.http.HtmlParser;
 import com.orchidmaster.http.HtmlParser.IHtmlParserListener;
 
 public class MainPresenter implements ComboBoxModel<String>,
 	IHtmlParserListener {
     private static HtmlParser htmlParser;
-    private static final File DATA_FOLDER = new File("C:" + File.separator
-	    + "OrchidMaster" + File.separator + "Data");
-    private static final File DATA_File = new File(
-	    DATA_FOLDER.getAbsolutePath() + File.separator + "data.txt");
+    private static File DATA_FOLDER;
+    private static File DATA_FILE;
     private MainWindow window;
     private List<String> urls;
     private int selectedIndex;
@@ -34,6 +37,22 @@ public class MainPresenter implements ComboBoxModel<String>,
 
     public void load() {
 	urls = new ArrayList<String>();
+
+	String fileContents = new Gson().toJson(urls);
+	try {
+	    InputStream stream = new FileInputStream(DATA_FILE);
+	    byte[] buffer = new byte[(int) DATA_FILE.length()];
+	    stream.read(buffer);
+
+	    fileContents = new String(buffer);
+	    urls = new Gson().fromJson(fileContents, List.class);
+	    if (urls == null) {
+		urls = new ArrayList<String>();
+	    }
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+
 	window.refresh();
     }
 
@@ -68,23 +87,48 @@ public class MainPresenter implements ComboBoxModel<String>,
 	if (url.length() == 0)
 	    return;
 	urls.remove(url);
+	save();
 	window.refresh();
     }
 
     private void save() {
-	// TODO Auto-generated method stub
-
+	String fileContents = new Gson().toJson(urls);
+	try {
+	    OutputStream streamOut = new FileOutputStream(DATA_FILE);
+	    streamOut.write(fileContents.getBytes());
+	    streamOut.close();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
     }
 
     private void setupMainDirectory() {
+	String driveLetter = "c";
+	File[] roots = File.listRoots();
+	boolean found = false;
+	for (int i = 0; i < roots.length; i++) {
+	    if (roots[i].getAbsolutePath().substring(0, 1).toLowerCase()
+		    .equals(driveLetter))
+		found = true;
+	}
+	driveLetter = found ? driveLetter : roots[0].getAbsolutePath()
+		.substring(0, 1).toLowerCase();
+
+	DATA_FOLDER = new File(driveLetter + ":" + File.separator
+		+ "OrchidMaster" + File.separator + "Data");
+
 	if (!DATA_FOLDER.exists()) {
+
 	    if (!DATA_FOLDER.mkdirs())
 		System.err.println("failed to make directory "
 			+ DATA_FOLDER.getAbsolutePath());
 	}
-	if (!DATA_File.exists())
+
+	DATA_FILE = new File(DATA_FOLDER.getAbsolutePath() + File.separator
+		+ "data.txt");
+	if (!DATA_FILE.exists())
 	    try {
-		DATA_File.createNewFile();
+		DATA_FILE.createNewFile();
 	    } catch (IOException e) {
 		e.printStackTrace();
 		System.err.println("failed to make file!");
@@ -130,12 +174,10 @@ public class MainPresenter implements ComboBoxModel<String>,
     @Override
     public void onParsed(String content) {
 	window.setContent(content);
-
     }
 
     @Override
     public void onMalformedURLException(MalformedURLException e) {
-	// TODO Auto-generated method stub
-
+	window.setContent("Bad URL");
     }
 }
