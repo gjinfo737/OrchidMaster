@@ -110,7 +110,7 @@ public final class WebRequestCodeSample {
 		httpResponseListener.onException(e);
 		return;
 	    }
-	    httpResponseListener.onResponse(content);
+	    httpResponseListener.onResponse(content, url.toExternalForm());
 
 	    try {
 		outputStreamWriter.close();

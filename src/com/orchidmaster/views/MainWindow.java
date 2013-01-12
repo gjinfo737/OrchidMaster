@@ -6,8 +6,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -18,7 +19,8 @@ public class MainWindow extends JFrame {
     private JTextField textFieldUrlEntry;
     private JComboBox<String> comboBoxLinks;
     private MainPresenter presenter;
-    private JTextArea textAreaContent;
+    private JScrollPane scrollPane;
+    private JTextPane textPane;
 
     public MainWindow(MainPresenter _presenter) {
 	this.presenter = _presenter;
@@ -36,6 +38,8 @@ public class MainWindow extends JFrame {
 			RowSpec.decode("23px"),
 			FormFactory.RELATED_GAP_ROWSPEC,
 			RowSpec.decode("23px"),
+			FormFactory.RELATED_GAP_ROWSPEC,
+			RowSpec.decode("default:grow"),
 			FormFactory.RELATED_GAP_ROWSPEC,
 			RowSpec.decode("311px:grow"), }));
 
@@ -72,8 +76,11 @@ public class MainWindow extends JFrame {
 	getContentPane().add(btnRemove, "4, 4, fill, top");
 	comboBoxLinks.setModel(this.presenter);
 
-	textAreaContent = new JTextArea();
-	getContentPane().add(textAreaContent, "2, 6, 5, 1, fill, fill");
+	scrollPane = new JScrollPane();
+	getContentPane().add(scrollPane, "2, 6, 5, 3, fill, fill");
+
+	textPane = new JTextPane();
+	scrollPane.setViewportView(textPane);
 	comboBoxLinks.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
 		presenter.setSelectedItem(comboBoxLinks.getSelectedItem());
@@ -94,6 +101,6 @@ public class MainWindow extends JFrame {
     }
 
     public void setContent(String content) {
-	textAreaContent.setText(content);
+	textPane.setText(content);
     }
 }
