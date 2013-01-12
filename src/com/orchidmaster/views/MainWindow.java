@@ -6,8 +6,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -18,7 +18,7 @@ public class MainWindow extends JFrame {
     private JTextField textFieldUrlEntry;
     private JComboBox<String> comboBoxLinks;
     private MainPresenter presenter;
-    private JTextPane textPane;
+    private JTextArea textAreaContent;
 
     public MainWindow(MainPresenter _presenter) {
 	this.presenter = _presenter;
@@ -27,7 +27,7 @@ public class MainWindow extends JFrame {
 	getContentPane().setLayout(
 		new FormLayout(new ColumnSpec[] {
 			FormFactory.UNRELATED_GAP_COLSPEC,
-			ColumnSpec.decode("358px"),
+			ColumnSpec.decode("358px:grow"),
 			FormFactory.UNRELATED_GAP_COLSPEC,
 			ColumnSpec.decode("96px"),
 			FormFactory.UNRELATED_GAP_COLSPEC,
@@ -37,7 +37,7 @@ public class MainWindow extends JFrame {
 			FormFactory.RELATED_GAP_ROWSPEC,
 			RowSpec.decode("23px"),
 			FormFactory.RELATED_GAP_ROWSPEC,
-			RowSpec.decode("311px"), }));
+			RowSpec.decode("311px:grow"), }));
 
 	textFieldUrlEntry = new JTextField();
 	getContentPane().add(textFieldUrlEntry, "2, 2, fill, center");
@@ -63,9 +63,6 @@ public class MainWindow extends JFrame {
 	});
 	getContentPane().add(btnGet, "6, 2, 1, 3, fill, fill");
 
-	textPane = new JTextPane();
-	getContentPane().add(textPane, "2, 6, 5, 1, fill, fill");
-
 	JButton btnRemove = new JButton("Remove");
 	btnRemove.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
@@ -74,6 +71,9 @@ public class MainWindow extends JFrame {
 	});
 	getContentPane().add(btnRemove, "4, 4, fill, top");
 	comboBoxLinks.setModel(this.presenter);
+
+	textAreaContent = new JTextArea();
+	getContentPane().add(textAreaContent, "2, 6, 5, 1, fill, fill");
 	comboBoxLinks.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent arg0) {
 		presenter.setSelectedItem(comboBoxLinks.getSelectedItem());
@@ -94,6 +94,6 @@ public class MainWindow extends JFrame {
     }
 
     public void setContent(String content) {
-	textPane.setText(content);
+	textAreaContent.setText(content);
     }
 }
