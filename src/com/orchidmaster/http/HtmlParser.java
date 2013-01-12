@@ -40,36 +40,83 @@ public class HtmlParser implements IHttpResponseListener {
 	int index = lwrCaseContent.indexOf("Type species".toLowerCase());
 	String parsedContent = "";
 	List<Link> links = parseLinks(parentURL, lwrCaseContent, index);
+	List<Link> images = parseImages(parentURL, content.trim(), index);
 
 	for (Link l : links) {
+	    parsedContent += "\n" + l.getLinkContent() + "[" + l.getUrl() + "]";
+	}
+	parsedContent += "\n";
+	parsedContent += "\n";
+	parsedContent += "\n::: IMAGES :::";
+	parsedContent += "\n";
+	parsedContent += "\n";
+	for (Link l : images) {
 	    parsedContent += "\n" + l.getLinkContent() + "[" + l.getUrl() + "]";
 	}
 
 	htmlParserListener.onParsed(parsedContent);
     }
 
+    public List<Link> parseImages(String parentURL, String content, int index) {
+	List<Integer> indicesOfOccurence = new ArrayList<Integer>();
+	getIndicesOfOccurence(indicesOfOccurence, content, "img src", index);
+
+	List<Link> links = new ArrayList<Link>();
+	for (Integer I : indicesOfOccurence) {
+	    if (I != -1) {
+		String substring = content.substring(I);
+		//
+		parseImageObject(substring, links, parentURL);
+		//
+	    }
+	}
+	return links;
+    }
+
     public List<Link> parseLinks(String parentURL, String lwrCaseContent,
 	    int index) {
 	List<Integer> indicesOfOccurence = new ArrayList<Integer>();
-	// getIndicesOfOccurence(indicesOfOccurence, lwrCaseContent, "img src",
-	// index);
 	getIndicesOfOccurence(indicesOfOccurence, lwrCaseContent, "a href",
 		index);
 
 	List<Link> links = new ArrayList<Link>();
 	for (Integer I : indicesOfOccurence) {
 
-	    int end = "img src".length() + I + 1;
-	    if (end < lwrCaseContent.length() && I != -1) {
+	    if (I != -1) {
 		String substring = lwrCaseContent.substring(I);
-
-		//
 		parseLink(substring, links, parentURL);
-		//
-
 	    }
 	}
 	return links;
+    }
+
+    private void parseImageObject(String content, List<Link> links,
+	    String parentURL) {
+	int indexOfSRC = content.indexOf("src");
+	if (indexOfSRC == -1) {
+	    return;
+	}
+	int indexOfArrowForward = content.indexOf(">");
+	if (indexOfArrowForward == -1) {
+	    return;
+	}
+	String linkContent = content.substring(indexOfSRC, indexOfArrowForward);
+	int indexOfAlt = content.indexOf("alt");
+	if (indexOfAlt != -1 && indexOfAlt < indexOfArrowForward) {
+	    int indexOfEqual = content.indexOf("=", indexOfAlt);
+	    if (indexOfEqual != -1) {
+		String blank = content.substring(indexOfAlt, indexOfEqual)
+			.replace("alt", "").replace("=", "").trim();
+		if (blank.length() == 0) {
+		    linkContent = content.substring(indexOfSRC, indexOfAlt);
+		}
+	    }
+	}
+
+	linkContent = cleanLinkContnet(linkContent);
+	Link imgLink = new Link(linkContent, linkContent, parentURL);
+	links.add(imgLink);
+	System.out.println("# " + linkContent);
     }
 
     private void parseLink(String lwrCaseContent, List<Link> links,
@@ -102,7 +149,7 @@ public class HtmlParser implements IHttpResponseListener {
 	Link link = new Link(linkContent, url, parent_url);
 
 	links.add(link);
-	System.out.println(": " + linkContent + " " + url + " ~" + parent_url);
+
     }
 
     private String extractParentFolder(String parent_url) {
@@ -122,15 +169,23 @@ public class HtmlParser implements IHttpResponseListener {
 	linkContent = linkContent.replace(">", "");
 	linkContent = linkContent.replace("<", "");
 	linkContent = linkContent.replace("~", "");
+	linkContent = linkContent.replace("src=", "");
+	linkContent = linkContent.replace("src =", "");
+	linkContent = cleanQuotesAndApostrophes(linkContent);
 	linkContent = linkContent.trim();
 	return linkContent;
     }
 
     private String cleanUrl(String url) {
 	url = url.replace("=", "");
+	url = cleanQuotesAndApostrophes(url);
+	return url.trim();
+    }
+
+    public String cleanQuotesAndApostrophes(String url) {
 	url = url.replace("\"", "");
 	url = url.replace("'", "");
-	return url.trim();
+	return url;
     }
 
     public void getIndicesOfOccurence(List<Integer> indicesOfOccurence,
